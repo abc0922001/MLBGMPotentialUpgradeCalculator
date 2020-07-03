@@ -81,8 +81,8 @@ namespace MLBGMPotentialUpgradeCalculator
             avgCount = (double)totalTestCount / TEST_COUNT;
             //Console.WriteLine(string.Format("平均升級到 {0} 等，要 {1} 次，共花費 {3} 元", maxLevel, avgCount, StDev(arrData), avgCount * COST));
 
-            Console.WriteLine(string.Format("平均升級到 {0} 等，要 {1} 次，共花費 {2} 萬元", maxLevel, Math.Round(avgCount, 2), Math.Round(avgCount * COST / 10000)));
-            Console.WriteLine(string.Format("安全升級到 {0} 等，要 {1} 次，共花費 {2} 萬元", maxLevel, Math.Round(avgCount + sd * StDev(arrData), 2), Math.Round((avgCount + sd * StDev(arrData)) * COST / 10000)));
+            Console.WriteLine(string.Format("平均升級到 {0} 等，要 {1} 次，共花費 {2} 萬元", maxLevel, Math.Round(avgCount, 2).ToString().PadRight(7, (char)32), Math.Round(avgCount * COST / 10000)).ToString().PadRight(5, (char)32));
+            Console.WriteLine(string.Format("安全升級到 {0} 等，要 {1} 次，共花費 {2} 萬元", maxLevel, Math.Round(avgCount + sd * StDev(arrData), 2).ToString().PadRight(7, (char)32), Math.Round((avgCount + sd * StDev(arrData)) * COST / 10000)).ToString().PadRight(5, (char)32));
             goto start;
 
             //結束
