@@ -16,8 +16,8 @@ namespace MLBGMPotentialUpgradeCalculator
             int[] upgradeTo3 = { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 }; //50%
             int[] upgradeTo4 = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 }; //40%
             int[] upgradeTo5 = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }; //30%
-            int[] upgradeTo6 = { 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 }; //20%
-            int[] upgradeTo7 = { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; //10%
+            int[] upgradeTo6 = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }; //30%
+            int[] upgradeTo7 = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }; //30%
 
             const int COST = 40000; //花費           
             const int TEST_COUNT = 99999;//總測試次數
