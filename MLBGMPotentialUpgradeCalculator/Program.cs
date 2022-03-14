@@ -22,7 +22,7 @@ namespace MLBGMPotentialUpgradeCalculator
             const int COST = 40000; //花費           
             const int TEST_COUNT = 999;//總測試次數
 
-            start:
+        start:
 
             Console.WriteLine("請輸入要達到的等級");
 
@@ -32,7 +32,7 @@ namespace MLBGMPotentialUpgradeCalculator
 
             Double avgCount = 0d; //平均次數
             int nowLevel = initLevel; //目前等級
-            Double sd = 2d; //幾倍標準差
+            Double sd = 1.959964d; //幾倍標準差
             float[] arrData = new float[TEST_COUNT];
 
             Random rnd = new Random();
