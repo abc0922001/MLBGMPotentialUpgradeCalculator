@@ -1,127 +1,83 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 
 namespace MLBGMPotentialUpgradeCalculator
 {
     class Program
     {
+        // 定義靜態常量和變數
+        private const int TEST_COUNT = 999999;
+        private static readonly Double STANDARD_DEVIATION_FACTOR = 1.959964d;
+        private static readonly Random random = new Random(); // 靜態隨機數生成器
+        private static readonly int[] MergeOK = { 1, 0, 0, 0, 0, 0, 0 };
+
         static void Main(string[] args)
         {
-
-            //初始化機率
-            int[] upgradeTo1 = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; //100%
-            int[] upgradeTo2 = { 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 }; //70%
-            int[] upgradeTo3 = { 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 }; //50%
-            int[] upgradeTo4 = { 1, 1, 1, 1, 0, 0, 0, 0, 0, 0 }; //40%
-            int[] upgradeTo5 = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }; //30%
-            int[] upgradeTo6 = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }; //30%
-            int[] upgradeTo7 = { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 }; //30%
-
-            const int COST = 50000; //花費           
-            const int TEST_COUNT = 999;//總測試次數
-
-        start:
-
-            Console.WriteLine("請輸入要達到的等級");
-
-            int initLevel = 0; //初始等級
-            int maxLevel = Convert.ToInt32(Console.ReadLine()); //最大等級
-            int totalTestCount = 0;
-
-            Double avgCount = 0d; //平均次數
-            int nowLevel = initLevel; //目前等級
-            Double sd = 1.959964d; //幾倍標準差
-            float[] arrData = new float[TEST_COUNT];
-
-            Random rnd = new Random();
-            //測試
-            for (int i = 1; i < TEST_COUNT + 1; i++)
+            while (true)
             {
-                int upgradesCount = 0; //升級次數
-                while (nowLevel != maxLevel)
+                Console.WriteLine("要合成幾個：");
+                if (!int.TryParse(Console.ReadLine(), out int maxCount) || maxCount <= 0)
                 {
-                    switch (nowLevel)
-                    {
-                        case 0:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo1);
-                            break;
-                        case 1:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo2);
-                            break;
-                        case 2:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo3);
-                            break;
-                        case 3:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo4);
-                            break;
-                        case 4:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo5);
-                            break;
-                        case 5:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo6);
-                            break;
-                        case 6:
-                            nowLevel = GetUpgradedLevel(rnd, nowLevel, upgradeTo7);
-                            break;
-                    }
-                    upgradesCount += 1;
-
+                    Console.WriteLine("請輸入一個正整數。");
+                    continue;
                 }
-                //Console.WriteLine(string.Format("{0}. 升級 {1} 次", i, upgradesCount));
-                //if (upgradesCount == MAX_LEVEL)
-                //{
-                //    Console.WriteLine(string.Format("第 {0} 次的時候，只需要 {1} 次就衝到 {2} 等", i, upgradesCount, MAX_LEVEL));
-                //}
-                arrData[i - 1] = (float)upgradesCount;
-                totalTestCount += upgradesCount;
-                nowLevel = initLevel;//初始化等級
+
+                double[] arrData = new double[TEST_COUNT];
+                double totalTestCount = 0;
+
+                // 進行測試
+                for (int i = 0; i < TEST_COUNT; i++)
+                {
+                    arrData[i] = PerformTest(maxCount);
+                    totalTestCount += arrData[i];
+                }
+
+                double avgCount = totalTestCount / TEST_COUNT;
+                Console.WriteLine($"平均合成到 {maxCount} 個，要 {Math.Round(avgCount, 2)} 個");
+                Console.WriteLine($"安全合成到 {maxCount} 個，要 {Math.Round(avgCount + STANDARD_DEVIATION_FACTOR * StDev(arrData), 2)} 個");
             }
-            avgCount = (double)totalTestCount / TEST_COUNT;
-            //Console.WriteLine(string.Format("平均升級到 {0} 等，要 {1} 次，共花費 {3} 元", maxLevel, avgCount, StDev(arrData), avgCount * COST));
-
-            Console.WriteLine(string.Format("平均升級到 {0} 等，要 {1} 次，共花費 {2} 萬元", maxLevel, Math.Round(avgCount, 2).ToString().PadRight(7, (char)32), Math.Round(avgCount * COST / 10000)).ToString().PadRight(5, (char)32));
-            Console.WriteLine(string.Format("安全升級到 {0} 等，要 {1} 次，共花費 {2} 萬元", maxLevel, Math.Round(avgCount + sd * StDev(arrData), 2).ToString().PadRight(7, (char)32), Math.Round((avgCount + sd * StDev(arrData)) * COST / 10000)).ToString().PadRight(5, (char)32));
-            goto start;
-
-            //結束
-            //Console.ReadKey();
         }
 
-        private static int GetUpgradedLevel(Random rnd, int nowLevel, int[] upgradeToX)
+        private static double PerformTest(int maxCount)
         {
-            int successNumber = upgradeToX[rnd.Next(upgradeToX.Length)];
-            int level = nowLevel;
-            if (successNumber == 1)
+            int nowCount = 0, needFalseCount = 0, falseCount = 0;
+
+            while (nowCount != maxCount)
             {
-                level += 1;
+                falseCount = (falseCount == 0) ? 3 : 2;
+                needFalseCount += falseCount;
+
+                int successNumber = MergeOK[random.Next(MergeOK.Length)];
+                if (successNumber == 1) // 合成成功
+                {
+                    nowCount++;
+                    falseCount = 0;
+                }
+                else
+                {
+                    falseCount = 1;
+                }
             }
-            else
-            {
-                level = 0;
-            }
-            return level;
+
+            return needFalseCount;
         }
 
-        public static float StDev(float[] arrData) //计算标准偏差  
+        // 計算標準偏差
+        public static double StDev(double[] arrData)
         {
-            float xSum = 0F;
-            float xAvg = 0F;
-            float sSum = 0F;
-            float tmpStDev = 0F;
+            double xSum = 0, sSum = 0;
             int arrNum = arrData.Length;
-            for (int i = 0; i < arrNum; i++)
+
+            foreach (double x in arrData)
             {
-                xSum += arrData[i];
+                xSum += x;
             }
-            xAvg = xSum / arrNum;
-            for (int j = 0; j < arrNum; j++)
+            double xAvg = xSum / arrNum;
+
+            foreach (double x in arrData)
             {
-                sSum += ((arrData[j] - xAvg) * (arrData[j] - xAvg));
+                sSum += ((x - xAvg) * (x - xAvg));
             }
-            tmpStDev = Convert.ToSingle(Math.Sqrt((sSum / (arrNum - 1))).ToString());
-            return tmpStDev;
+            return Math.Sqrt(sSum / (arrNum - 1));
         }
     }
 }
